@@ -1,9 +1,9 @@
-import { showReading, showGenerated } from '../utils/logger.util';
-import { store } from '../store';
 import * as glob from 'glob';
-import * as ts2gql from 'ts2gql';
 import fs from 'fs-extra';
 import path from 'path';
+import { showReading, showGenerated } from '../utils/logger.util';
+import { store } from '../store';
+import * as compiler from '../compiler';
 
 export async function schemaActions(): Promise<any>  {
     if (store.in && store.schemaDir) {
@@ -16,7 +16,7 @@ export async function schemaActions(): Promise<any>  {
 
             await fs.createFile(outputFilePath)
             const writeStream = fs.createWriteStream(outputFilePath);
-            ts2gql.emit(file, [], writeStream);
+            compiler.emit(file, [], writeStream);
 
             showGenerated(outputFilePath);
         });
