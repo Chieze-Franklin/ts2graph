@@ -666,7 +666,7 @@ export default class Emitter {
         const deleteManyMutation = `deleteMany${pascalCasedName}s(where: ${name}WhereInput): ${name}BatchPayload!`;
         const updateMutation = `update${pascalCasedName}(id: ID!, data: ${name}UpdateInput!): ${name}`;
         const updateManyMutation = `updateMany${pascalCasedName}s(data: ${name}UpdateManyMutationInput!, where: ${name}WhereInput): ${name}BatchPayload!`;
-        const upsertMutation = `upsert${pascalCasedName}(id: ID!, create: ${name}CreateInput!, update: ${name}UpdateInput!): ${name}!;`
+        const upsertMutation = `upsert${pascalCasedName}(id: ID!, create: ${name}CreateInput!, update: ${name}UpdateInput!): ${name}!`
 
         const properties = [
             createMutation,
