@@ -10,12 +10,12 @@ import Emitter from './emitter';
 export * from './types';
 export { Emitter };
 
-export function load(schemaRootPath:string, rootNodeNames:string[]):types.TypeMap {
+export function load(schemaRootPath: string, rootNodeNames: string[]): types.TypeMap {
   schemaRootPath = path.resolve(schemaRootPath);
   const program = typescript.createProgram([schemaRootPath], {});
   const schemaRoot = program.getSourceFile(schemaRootPath);
 
-  const interfaces:{[key:string]:typescript.InterfaceDeclaration} = {};
+  const interfaces: { [key: string]: typescript.InterfaceDeclaration } = {};
   typescript.forEachChild((schemaRoot as typescript.Node), (node) => {
     if (!isNodeExported(node)) return;
     if (node.kind === typescript.SyntaxKind.InterfaceDeclaration) {
@@ -34,7 +34,7 @@ export function load(schemaRootPath:string, rootNodeNames:string[]):types.TypeMa
   const collector = new Collector(program);
   for (const name of rootNodeNames) {
     const rootInterface = interfaces[name];
-      if (!rootInterface) {
+    if (!rootInterface) {
       throw new Error(`No interface named ${name} was exported by ${schemaRootPath}`);
     }
     collector.addRootNode(rootInterface);
@@ -50,6 +50,27 @@ export function load(schemaRootPath:string, rootNodeNames:string[]):types.TypeMa
   });
 
   return collector.types;
+}
+
+export function foundSchema(schemaRootPath: string): boolean {
+  schemaRootPath = path.resolve(schemaRootPath);
+  const program = typescript.createProgram([schemaRootPath], {});
+  const schemaRoot = program.getSourceFile(schemaRootPath);
+  let foundSchema = false;
+
+  typescript.forEachChild((schemaRoot as typescript.Node), (node) => {
+    if (foundSchema) return;
+    if (!isNodeExported(node)) return;
+    if (node.kind === typescript.SyntaxKind.InterfaceDeclaration) {
+      const interfaceNode = <typescript.InterfaceDeclaration>node;
+      const documentation = util.documentationForNode(interfaceNode, (schemaRoot as typescript.SourceFile).text);
+      if (documentation && _.find(documentation.tags, {title: 'graphql', description: 'schema'})) {
+        foundSchema = true;
+      }
+    }
+  });
+
+  return foundSchema;
 }
 
 export function emit(

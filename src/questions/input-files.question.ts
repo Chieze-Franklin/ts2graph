@@ -2,11 +2,11 @@ import inquirer from 'inquirer';
 
 import { Answer } from '../models/answer';
 
-export async function inQuestion(): Promise<Answer> {
+export async function inputFilesQuestion(): Promise<Answer> {
 
     return await inquirer.prompt([{
-        name: 'in',
+        name: 'inputFiles',
         type: 'input',
-        message: 'Specify the input glob:'
+        message: 'Specify the input files:'
     }]);
 }

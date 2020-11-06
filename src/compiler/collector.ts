@@ -14,6 +14,8 @@ const TypeFlags = typescript.TypeFlags;
 export default class Collector {
   types:types.TypeMap = {
     Date: {type: 'alias', target: {type: 'string'}},
+    DateTime: {type: 'alias', target: {type: 'string'}},
+    Long: {type: 'alias', target: {type: 'string'}},
   };
   private checker:typescript.TypeChecker;
   private nodeMap:Map<typescript.Node, types.Node> = new Map();

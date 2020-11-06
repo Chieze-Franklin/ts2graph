@@ -1,5 +1,5 @@
 export interface Answer {
-    in?: string;
-    schemaDir?: string;
+    inputFiles?: string;
+    outputSchemaDir?: string;
     overwrite?: boolean;
 }

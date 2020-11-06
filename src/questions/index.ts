@@ -1,3 +1,3 @@
-export * from './in.question';
+export * from './input-files.question';
 export * from './overwrite-file.question';
-export * from './schema-directory.question';
+export * from './output-schema-dir.question';

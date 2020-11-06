@@ -6,19 +6,21 @@ import { store } from '../store';
 import * as compiler from '../compiler';
 
 export async function schemaActions(): Promise<any>  {
-    if (store.in && store.schemaDir) {
-        const files = glob.sync(store.in);
+    if (store.inputFiles && store.outputSchemaDir) {
+        const files = glob.sync(store.inputFiles);
         files.forEach(async file => {
             showReading(file);
 
-            const fileName = path.basename(file, '.ts');
-            const outputFilePath = path.resolve(path.join(store.schemaDir, `${fileName}.graphql`));
+            if (compiler.foundSchema(file)) {
+                const fileName = path.basename(file, '.ts');
+                const outputFilePath = path.resolve(path.join(store.outputSchemaDir, `${fileName}.graphql`));
 
-            await fs.createFile(outputFilePath)
-            const writeStream = fs.createWriteStream(outputFilePath);
-            compiler.emit(file, [], writeStream);
+                await fs.createFile(outputFilePath)
+                const writeStream = fs.createWriteStream(outputFilePath);
+                compiler.emit(file, [], writeStream);
 
-            showGenerated(outputFilePath);
+                showGenerated(outputFilePath);
+            }
         });
 
         return;

@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Answer } from './models/answer';
 import { schemaActions } from './actions';
-import { inQuestion, schemaDirectoryQuestion } from './questions';
+import { inputFilesQuestion, outputSchemaDirectoryQuestion } from './questions';
 import { showTitleAndBanner, showError } from './utils/logger.util';
 import { store } from './store';
 
@@ -25,22 +25,22 @@ export async function tsToGraph(): Promise<any> {
         }
     }
 
-    if ((configFile.config || {}).in) {
-        store.in = configFile.config.in;
+    if ((configFile.config || {}).inputFiles) {
+        store.inputFiles = configFile.config.inputFiles;
     } else {
-        showError(`Cannot find config.in in ${configFileName}`);
+        showError(`Cannot find config.inputFiles in ${configFileName}`);
 
-        const answer: Answer = await inQuestion();
-        store.in = answer.in;
+        const answer: Answer = await inputFilesQuestion();
+        store.inputFiles = answer.inputFiles;
     }
 
-    if ((configFile.config || {}).schemaDir) {
-        store.schemaDir = configFile.config.schemaDir;
+    if ((configFile.config || {}).outputSchemaDir) {
+        store.outputSchemaDir = configFile.config.outputSchemaDir;
     } else {
-        showError(`Cannot find config.schemaDir in ${configFileName}`);
+        showError(`Cannot find config.outputSchemaDir in ${configFileName}`);
 
-        const answer: Answer = await schemaDirectoryQuestion();
-        store.schemaDir = answer.schemaDir;
+        const answer: Answer = await outputSchemaDirectoryQuestion();
+        store.outputSchemaDir = answer.outputSchemaDir;
     }
 
     await schemaActions();
