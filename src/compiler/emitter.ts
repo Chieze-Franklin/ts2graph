@@ -142,7 +142,7 @@ export default class Emitter {
         if (!members.length) {
             members.push({
                 type: 'property',
-                name: '__placeholder',
+                name: '_placeholder',
                 signature: { type: 'boolean' },
             });
         }
@@ -189,7 +189,7 @@ export default class Emitter {
 
             let result = `type ${this._name(name)}${federationDecorator}${costDecorator}${directives} {\n${this._indent(properties)}\n}`;
 
-            if (name.toLowerCase() !== 'query' && name.toLowerCase() !== 'mutation'&& !name.startsWith('__')) {
+            if (name.toLowerCase() !== 'query' && name.toLowerCase() !== 'mutation'&& !name.startsWith('_')) {
                 // TODO: consider putting these extended emissions under a boolean flag so it can be turned off by user
 
                 // batch payload
@@ -267,7 +267,7 @@ export default class Emitter {
         if (!members.length) {
             members.push({
                 type: 'property',
-                name: '__placeholder',
+                name: '_placeholder',
                 signature: { type: 'boolean' },
             });
         }
@@ -346,7 +346,7 @@ export default class Emitter {
         if (!members.length) {
             members.push({
                 type: 'property',
-                name: '__placeholder',
+                name: '_placeholder',
                 signature: { type: 'boolean' },
             });
         }
@@ -383,7 +383,7 @@ export default class Emitter {
         if (!members.length) {
             members.push({
                 type: 'property',
-                name: '__placeholder',
+                name: '_placeholder',
                 signature: { type: 'boolean' },
             });
         }
@@ -454,7 +454,7 @@ export default class Emitter {
         if (!members.length) {
             members.push({
                 type: 'property',
-                name: '__placeholder',
+                name: '_placeholder',
                 signature: { type: 'boolean' },
             });
         }
@@ -521,7 +521,7 @@ export default class Emitter {
         if (!members.length) {
             members.push({
                 type: 'property',
-                name: '__placeholder',
+                name: '_placeholder',
                 signature: { type: 'boolean' },
             });
         }
