@@ -3,7 +3,11 @@ import * as doctrine from 'doctrine';
 export type SymbolName = string;
 
 export interface ComplexNode {
-  documentation?:doctrine.ParseResult;
+  documentation?: doctrine.ParseResult;
+}
+
+export interface OptionalNode {
+  optional?: boolean;
 }
 
 export interface InterfaceNode extends ComplexNode {
@@ -13,7 +17,7 @@ export interface InterfaceNode extends ComplexNode {
   concrete?:boolean; // Whether the type is directly used (returned).
 }
 
-export interface MethodNode extends ComplexNode {
+export interface MethodNode extends ComplexNode, OptionalNode {
   type:'method';
   name:string;
   parameters:{[key:string]:Node};
@@ -30,7 +34,7 @@ export interface ReferenceNode extends ComplexNode {
   target:SymbolName;
 }
 
-export interface PropertyNode extends ComplexNode {
+export interface PropertyNode extends ComplexNode, OptionalNode {
   type:'property';
   name:string;
   signature:Node;
@@ -74,7 +78,7 @@ export interface BooleanNode {
 }
 
 export interface AnyNode {
-  type:'any';
+  type: 'any';
 }
 
 export type Node =

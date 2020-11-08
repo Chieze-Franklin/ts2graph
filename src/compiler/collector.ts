@@ -12,19 +12,19 @@ const TypeFlags = typescript.TypeFlags;
  * referenced types.
  */
 export default class Collector {
-  types:types.TypeMap = {
+  types: types.TypeMap = {
     Date: {type: 'alias', target: {type: 'string'}},
     DateTime: {type: 'alias', target: {type: 'string'}},
     Long: {type: 'alias', target: {type: 'string'}},
   };
-  private checker:typescript.TypeChecker;
-  private nodeMap:Map<typescript.Node, types.Node> = new Map();
+  private checker: typescript.TypeChecker;
+  private nodeMap: Map<typescript.Node, types.Node> = new Map();
 
-  constructor(program:typescript.Program) {
+  constructor(program: typescript.Program) {
     this.checker = program.getTypeChecker();
   }
 
-  addRootNode(node:typescript.InterfaceDeclaration):void {
+  addRootNode(node: typescript.InterfaceDeclaration):void {
     this._walkNode(node);
     const simpleNode = <types.InterfaceNode>this.types[this._nameForSymbol(this._symbolForNode(node.name))];
     simpleNode.concrete = true;
@@ -45,15 +45,15 @@ export default class Collector {
 
   // Node Walking
 
-  _walkNode = (node:typescript.Node):types.Node => {
+  _walkNode = (node: typescript.Node): types.Node => {
     // Reentrant node walking.
     if (this.nodeMap.has(node)) {
       return this.nodeMap.get(node) as types.Node;
     }
-    const nodeReference:types.Node = <types.Node>{};
+    const nodeReference: types.Node = <types.Node>{};
     this.nodeMap.set(node, nodeReference);
 
-    let result:types.Node|null = null;
+    let result: types.Node|null = null;
     if (node.kind === SyntaxKind.InterfaceDeclaration) {
       result = this._walkInterfaceDeclaration(<typescript.InterfaceDeclaration>node);
     } else if (node.kind === SyntaxKind.MethodSignature) {
@@ -148,12 +148,13 @@ export default class Collector {
     };
   }
 
-  _walkPropertySignature(node:typescript.PropertySignature):types.Node {
+  _walkPropertySignature(node: typescript.PropertySignature): types.Node {
     return {
       type: 'property',
       name: node.name.getText(),
       documentation: util.documentationForNode(node),
       signature: this._walkNode(node.type!),
+      optional: !!(node.questionToken)
     };
   }
 
