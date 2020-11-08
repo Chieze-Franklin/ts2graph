@@ -167,7 +167,8 @@ export default class Emitter {
                 // TODO: if property is a reference to the plural of a type, create the appropriate params (where, orderBy, skip...)
                 const costDecorator = this._costHelper(member);
                 const directives = this._directiveHelper(member);
-                return `${this._name(member.name)}: ${this._emitExpression(member.signature)}${costDecorator}${directives}`;
+                const mark = member.optional ? '' : '!';
+                return `${this._name(member.name)}: ${this._emitExpression(member.signature)}${mark}${costDecorator}${directives}`;
             } else {
                 throw new Error(`Can't serialize ${member.type} as a property of an interface`);
             }
@@ -275,13 +276,13 @@ export default class Emitter {
         let properties = _.map(members, (member) => {
             if (member.type === 'method') {
                 if (_.size(member.parameters) === 0) {
-                    return this._emitInterfaceCreateInputClauses(member.returns, member.name);
+                    return this._emitInterfaceCreateInputClauses(member.returns, member.name, member.optional);
                 }
                 
                 return '';
             } else if (member.type === 'property') {
                 // TODO: if property is a reference to the plural of a type, create the appropriate clauses
-                return this._emitInterfaceCreateInputClauses(member.signature, member.name);
+                return this._emitInterfaceCreateInputClauses(member.signature, member.name, member.optional);
             } else {
                 throw new Error(`Can't serialize ${member.type} as a property of an interface`);
             }
@@ -290,29 +291,30 @@ export default class Emitter {
         return `input ${name}CreateInput {\n${this._indent(properties.filter(p => !!(p)))}\n}`;
     }
 
-    _emitInterfaceCreateInputClauses = (node: Types.Node, name: Types.SymbolName): string => {
+    _emitInterfaceCreateInputClauses = (node: Types.Node, name: Types.SymbolName, optional: boolean = false): string => {
         const expression = this._emitExpression(node);
+        const mark = optional ? '' : '!';
 
         if (!node) {
             return '';
         } else if (expression === 'ID') {
-            return `${name}: ${expression}`;
+            return `${name}: ${expression}`; // always optional, so can't end with "!"
         } else if (node.type === 'alias') {
             return this._emitInterfaceCreateInputClauses(node.target, name);
         } else if (node.type === 'array') {
             if (node.elements[0].type === 'reference') {
-                return `${name}: ${node.elements[0].target}CreateManyInput`;
+                return `${name}: ${node.elements[0].target}CreateManyInput${mark}`;
             } else {
-                return `${name}: ${expression}`;
+                return `${name}: ${expression}${mark}`;
             }
         } else if (node.type === 'reference') {
             if (this.enumNames.includes(expression) || this.scalarNames.includes(expression)) {
-                return `${name}: ${expression}`;
+                return `${name}: ${expression}${mark}`;
             } else {
-                return `${name}: ${node.target}CreateOneInput`;
+                return `${name}: ${node.target}CreateOneInput${mark}`;
             }
         } else {
-            return `${name}: ${expression}`;
+            return `${name}: ${expression}${mark}`;
         }
     }
 
