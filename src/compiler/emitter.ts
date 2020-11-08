@@ -190,7 +190,7 @@ export default class Emitter {
 
             let result = `type ${this._name(name)}${federationDecorator}${costDecorator}${directives} {\n${this._indent(properties)}\n}`;
 
-            if (name.toLowerCase() !== 'query' && name.toLowerCase() !== 'mutation'&& !name.startsWith('_')) {
+            if (name.toLowerCase() !== 'query' && name.toLowerCase() !== 'mutation' && name.toLowerCase() !== 'error' && !name.startsWith('_')) {
                 // TODO: consider putting these extended emissions under a boolean flag so it can be turned off by user
 
                 // batch payload
@@ -207,6 +207,9 @@ export default class Emitter {
 
                 // order by input
                 result = `${result}\n\n${this._emitInterfaceOrderByInput(node, name)}`;
+
+                // payload
+                result = `${result}\n\n${this._emitInterfacePayload(node, name)}`;
 
                 // update input
                 result = `${result}\n\n${this._emitInterfaceUpdateInput(node, name)}`;
@@ -247,8 +250,11 @@ export default class Emitter {
     }
 
     _emitInterfaceBatchPayload(node: Types.InterfaceNode, name: Types.SymbolName): string {
+        const camelCasedName = name.charAt(0).toLowerCase() + name.substr(1);
         const properties = [
-            `count: Long`
+            `count: Long`,
+            `errors: [Error]`,
+            `${camelCasedName}s: [${name}]`,
         ];
     
         return `type ${name}BatchPayload {\n${this._indent(properties)}\n}`;
@@ -369,6 +375,16 @@ export default class Emitter {
         });
     
         return `enum ${name}OrderByInput {\n${this._indent(properties.flat())}\n}`;
+    }
+
+    _emitInterfacePayload(node: Types.InterfaceNode, name: Types.SymbolName): string {
+        const camelCasedName = name.charAt(0).toLowerCase() + name.substr(1);
+        const properties = [
+            `${camelCasedName}: ${name}`,
+            `errors: [Error]`
+        ];
+
+        return `type ${name}Payload {\n${this._indent(properties)}\n}`;
     }
 
     _emitInterfaceUpdateInput(node: Types.InterfaceNode, name: Types.SymbolName): string {
@@ -663,12 +679,12 @@ export default class Emitter {
     _emitMutationExtension(node: Types.InterfaceNode, name: Types.SymbolName): string {
         const pascalCasedName = name.charAt(0).toUpperCase() + name.substr(1);
  
-        const createMutation = `create${pascalCasedName}(data: ${name}CreateInput!): ${name}!`;
-        const deleteMutation = `delete${pascalCasedName}(id: ID!): ${name}`;
+        const createMutation = `create${pascalCasedName}(data: ${name}CreateInput!): ${name}Payload!`;
+        const deleteMutation = `delete${pascalCasedName}(id: ID!): ${name}Payload`;
         const deleteManyMutation = `deleteMany${pascalCasedName}s(where: ${name}WhereInput): ${name}BatchPayload!`;
-        const updateMutation = `update${pascalCasedName}(id: ID!, data: ${name}UpdateInput!): ${name}`;
+        const updateMutation = `update${pascalCasedName}(id: ID!, data: ${name}UpdateInput!): ${name}Payload`;
         const updateManyMutation = `updateMany${pascalCasedName}s(data: ${name}UpdateManyMutationInput!, where: ${name}WhereInput): ${name}BatchPayload!`;
-        const upsertMutation = `upsert${pascalCasedName}(id: ID!, create: ${name}CreateInput!, update: ${name}UpdateInput!): ${name}!`
+        const upsertMutation = `upsert${pascalCasedName}(id: ID!, create: ${name}CreateInput!, update: ${name}UpdateInput!): ${name}Payload!`
 
         const properties = [
             createMutation,
@@ -685,10 +701,10 @@ export default class Emitter {
     _emitQueryExtension(node: Types.InterfaceNode, name: Types.SymbolName): string {
         const camelCasedName = name.charAt(0).toLowerCase() + name.substr(1);
 
-        const singularQuery = `${camelCasedName}(id: ID!): ${name}`;
+        const singularQuery = `${camelCasedName}(id: ID!): ${name}Payload!`;
         // const singularQuery2 = `${camelCasedName}(where: ${name}WhereUniqueInput!): ${name}`;
         const queryParams = `where: ${name}WhereInput, orderBy: ${name}OrderByInput, skip: Int, after: String, before: String, first: Int, last: Int`;
-        const pluralQuery = `${camelCasedName}s(${queryParams}): [${name}]!`;
+        const pluralQuery = `${camelCasedName}s(${queryParams}): ${name}BatchPayload!`;
 
         const properties = [
             singularQuery,

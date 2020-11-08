@@ -1,6 +1,6 @@
 {
   "name": "ts2graph",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "CLI tool to convert TypeScript types to GraphQL types",
   "main": "./lib/index.js",
   "scripts": {
