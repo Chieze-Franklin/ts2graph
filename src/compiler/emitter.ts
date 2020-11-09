@@ -167,7 +167,7 @@ export default class Emitter {
                 // TODO: if property is a reference to the plural of a type, create the appropriate params (where, orderBy, skip...)
                 const costDecorator = this._costHelper(member);
                 const directives = this._directiveHelper(member);
-                const mark = member.optional ? '' : '!';
+                const mark = member.optional || this._getDocTag(node, 'schema') ? '' : '!';
                 return `${this._name(member.name)}: ${this._emitExpression(member.signature)}${mark}${costDecorator}${directives}`;
             } else {
                 throw new Error(`Can't serialize ${member.type} as a property of an interface`);
